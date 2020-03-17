@@ -85,6 +85,46 @@ bool func()
 }
 
 
+//Selecting function
+template<typename BidirectionalIterator>
+constexpr void reverse(BidirectionalIterator first, BidirectionalIterator last,
+		  std::bidirectional_iterator_tag)
+{
+	while (true)
+	{
+		if (first == last || first == --last)
+		{
+  			return;
+  		}
+		else
+		{
+			std::iter_swap(first, last);
+			++first;
+		}
+	}
+}
+
+template<typename RandomAccessIterator>
+constexpr void reverse(RandomAccessIterator first, RandomAccessIterator last, std::random_access_iterator_tag)
+{
+	if (first == last)
+		return;
+	--last;
+	while (first < last)
+	{
+		std::iter_swap(first, last);
+		++first;
+		--last;
+	}
+}
+
+
+template<typename BidirectionalIterator>
+constexpr void reverse(BidirectionalIterator first, BidirectionalIterator last)
+{
+	using IteratorCategory = std::iterator_traits<BidirectionalIterator>::iterator_category;
+	std::reverse(first, last, IteratorCategory{});
+}
 template <typename...>
 struct TD;
 int main()
