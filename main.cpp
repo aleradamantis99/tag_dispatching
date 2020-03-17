@@ -11,6 +11,7 @@ struct Pair
 {
 	T1 first;
 	T2 second;
+
 	constexpr Pair(): first{}, second{} {};
 	
 	constexpr Pair(const T1& x, const T2& y): first(x), second(y) {}
@@ -21,7 +22,7 @@ struct Pair
 		second(std::forward<U2>(y))  {}
 	
 	template <class U1, class U2>
-	constexpr Pair( const Pair<U1, U2>& p ): first(p.first), second(p.second){}
+	constexpr Pair(const Pair<U1, U2>& p): first(p.first), second(p.second){}
 	
 	template <class U1, class U2>
 	constexpr Pair(Pair<U1, U2>&& p):
@@ -55,13 +56,47 @@ private:
 template <typename U1, typename U2>
 Pair(U1&&, U2&&) -> Pair<std::remove_cvref_t<U1>, std::remove_cvref_t<U2>>;
 */
+
+//Partial Specialization
+
+namespace detail
+{
+template <typename>
+struct Type{};
+
+template <size_t N, typename T>
+bool func(Type<T>)
+{
+	return N>static_cast<T>(2);
+}
+
+template <size_t N>
+bool func(Type<int>)
+{
+	return N>1;
+}
+}
+
+template <typename T, size_t N>
+bool func()
+{
+	using namespace detail;
+	return func<N>(Type<T>{});
+}
+
+
+template <typename...>
+struct TD;
 int main()
 {
 	int a=1, b=2;
 	Pair p{b, 3};
+	
 	Pair c(p);
 	using MyPair = Pair<std::vector<int>, std::vector<float>>;
 	MyPair vs(PiecewiseConstruct, std::forward_as_tuple(4, 1),
 	 								std::forward_as_tuple(5, 3.5));
+	 								
+	std::cout << func<size_t, 2>();
 	return 0;
 }
