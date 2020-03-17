@@ -2,6 +2,8 @@
 #include <vector>
 #include <tuple>
 //CONSTRUCTORES
+namespace tags
+{
 struct PiecewiseConstruct_t {};
 
 constexpr PiecewiseConstruct_t PiecewiseConstruct;
@@ -88,7 +90,7 @@ bool func()
 //Selecting function
 template<typename BidirectionalIterator>
 constexpr void reverse(BidirectionalIterator first, BidirectionalIterator last,
-		  std::bidirectional_iterator_tag)
+		  std::bidirectional_iterator_tag)	
 {
 	while (true)
 	{
@@ -110,7 +112,7 @@ constexpr void reverse(RandomAccessIterator first, RandomAccessIterator last, st
 	if (first == last)
 		return;
 	--last;
-	while (first < last)
+	while (first < last)		//operator< can only be used with random_access_iterator
 	{
 		std::iter_swap(first, last);
 		++first;
@@ -123,20 +125,21 @@ template<typename BidirectionalIterator>
 constexpr void reverse(BidirectionalIterator first, BidirectionalIterator last)
 {
 	using IteratorCategory = std::iterator_traits<BidirectionalIterator>::iterator_category;
-	std::reverse(first, last, IteratorCategory{});
+	reverse(first, last, IteratorCategory{});
 }
+}
+
 template <typename...>
 struct TD;
 int main()
 {
-	int a=1, b=2;
-	Pair p{b, 3};
-	
-	Pair c(p);
+	using namespace tags;
 	using MyPair = Pair<std::vector<int>, std::vector<float>>;
 	MyPair vs(PiecewiseConstruct, std::forward_as_tuple(4, 1),
 	 								std::forward_as_tuple(5, 3.5));
 	 								
-	std::cout << func<size_t, 2>();
+	std::cout << func<size_t, 2>() << std::endl;
+	
+	tags::reverse(vs.first.begin(), vs.first.end());
 	return 0;
 }
